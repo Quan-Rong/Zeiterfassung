@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Zeiterfassung — Webbasierte Dokumentation der täglichen Arbeitszeit für Home Office">
+    <title>Zeiterfassung — Arbeitszeitdokumentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="app-header">
+        <div class="header-top">
+            <h1 id="appTitle" class="app-title">Vorlage zur Dokumentation der täglichen Arbeitszeit</h1>
+        </div>
+        <div class="header-info">
+            <div class="info-row">
+                <div class="info-field">
+                    <label id="labelNachname" for="inputNachname">Nachname:</label>
+                    <input type="text" id="inputNachname" class="info-input" placeholder="z.B. Schmidt">
+                </div>
+                <div class="info-field">
+                    <label id="labelVorname" for="inputVorname">Vorname:</label>
+                    <input type="text" id="inputVorname" class="info-input" placeholder="z.B. Max">
+                </div>
+                <div class="info-field">
+                    <label id="labelPersNr" for="inputPersNr">Pers.-Nr.:</label>
+                    <input type="text" id="inputPersNr" class="info-input" placeholder="z.B. 123456">
+                </div>
+                <div class="info-field">
+                    <label id="labelAbteilung" for="inputAbteilung">Abteilung:</label>
+                    <input type="text" id="inputAbteilung" class="info-input" placeholder="z.B. IT">
+                </div>
+            </div>
+
+            <div class="month-control-group">
+                <div class="info-month-display small-month-display">
+                    <span id="displayMonat"></span> <span id="displayJahr"></span>
+                </div>
+                <button id="btnClearMonth" class="btn btn-danger btn-xs btn-clear-month" title="Monat leeren">
+                    🗑️ Monat leeren
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="app-main">
+        <!-- 左侧：日历 + 录入表单 -->
+        <section class="panel-left">
+            <div id="calendarContainer" class="calendar-container"></div>
+
+            <!-- Home Office 计数器 -->
+            <div class="ho-counter-card compact-card">
+                <div class="ho-counter-header-row">
+                    <span id="labelHOCounter" class="ho-label">Homeoffice:</span>
+                    <span id="hoCountDisplay" class="ho-count">0 / 5,5</span>
+                </div>
+                <div class="ho-progress-bar small-bar">
+                    <div id="hoProgressBarFill" class="ho-progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="ho-footer-row">
+                    <span id="hoRemainingDisplay" class="ho-remaining">Rest: 5,5</span>
+                    <div id="hoLimitWarning" class="ho-limit-warning hidden">! Limit !</div>
+                </div>
+            </div>
+
+            <!-- 功能按钮区域 -->
+            <div class="action-buttons-area">
+                <button id="btnOpenUrlaubModal" class="btn btn-secondary btn-full-width btn-sm">
+                    <span class="btn-icon">🌴</span> <span id="labelBtnUrlaub">Urlaub / GLZ</span>
+                </button>
+                <button id="btnOpenKrankModal" class="btn btn-secondary btn-full-width btn-sm">
+                    <span class="btn-icon">🤒</span> <span id="labelBtnKrank">Krank / Sonstiges</span>
+                </button>
+            </div>
+
+            <!-- 时间录入表单 -->
+            <div id="entryFormPanel" class="entry-form-panel hidden">
+                <div class="form-header compact-header">
+                    <h3 id="formTitleText">Entry</h3>
+                    <span id="formDateDisplay" class="form-date-display"></span>
+                </div>
+                <div class="form-body compact-body">
+                    <div class="form-row">
+                        <label id="labelFormType" for="formType">Typ</label>
+                        <select id="formType" class="form-select form-select-sm"></select>
+                    </div>
+
+                    <div id="timeFieldsGroup">
+                        <div class="form-row-group">
+                            <div class="form-col">
+                                <label id="labelFormBeginn" for="formBeginn">Von</label>
+                                <input type="time" id="formBeginn" class="form-time form-control-sm">
+                            </div>
+                            <div class="form-col">
+                                <label id="labelFormEnde" for="formEnde">Bis</label>
+                                <input type="time" id="formEnde" class="form-time form-control-sm">
+                            </div>
+                        </div>
+
+                        <div class="form-row-group">
+                            <div class="form-col">
+                                <label id="labelFormPause" for="formPause">Pause</label>
+                                <input type="number" id="formPause" class="form-number form-control-sm" min="0"
+                                    step="15">
+                            </div>
+                            <div class="form-col checkbox-col">
+                                <div class="form-row-checkbox small-checkbox">
+                                    <input type="checkbox" id="formHalfDay">
+                                    <label id="labelFormHalfDay" for="formHalfDay">0,5</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-dauer-row small-dauer">
+                            <span id="labelFormDauer">Dauer:</span>
+                            <span id="formDauerDisplay" class="form-dauer-value">-</span>
+                        </div>
+                    </div>
+
+                    <div id="formWarnings"></div>
+
+                    <div class="form-actions compact-actions">
+                        <button id="btnFormConfirm" class="btn btn-primary btn-sm">OK</button>
+                        <button id="btnFormCancel" class="btn btn-secondary btn-sm">Cancel</button>
+                        <button id="btnFormDelete" class="btn btn-danger btn-sm btn-delete-row">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 右侧：时间表 -->
+        <section class="panel-right">
+            <div id="timesheetContainer" class="timesheet-container"></div>
+        </section>
+    </main>
+
+    <footer class="app-footer compact-footer">
+        <div class="footer-left">
+            <div class="footer-version-text">
+                <span>Zeiterfassung v2.1.0 — Open Source. Nutzung auf eigene Gefahr. Keine Haftung für Fehler.</span><br>
+                <span>Bitte keine Funktionen hinzufügen, die gegen den Gestamp Code of Conduct verstoßen.</span>
+            </div>
+        </div>
+
+        <div class="footer-actions">
+            <button id="btnBackup" class="btn btn-secondary btn-sm" title="Backup erstellen">💾 Backup</button>
+            <button id="btnImport" class="btn btn-secondary btn-sm" title="Backup importieren">📥 Import</button>
+            <button id="btnThemeToggle" class="btn btn-secondary btn-sm" title="Theme wechseln">🌓 Theme</button>
+            <button id="btnExport" class="btn btn-export btn-sm" title="Excel exportieren">📊 Excel</button>
+            <button id="btnPdfExport" class="btn btn-secondary btn-sm" title="PDF exportieren">📄 PDF</button>
+            <button id="btnPrint" class="btn btn-secondary btn-sm">Drucken</button>
+        </div>
+    </footer>
+
+    <!-- ===== MODALS ===== -->
+    <div id="absenceModal" class="modal-overlay hidden">
+        <div class="modal-content compact-modal">
+            <div class="modal-header compact-modal-header">
+                <h3 id="modalTitleAbsence">Abwesenheit</h3>
+                <span id="btnCloseAbsenceModal" class="modal-close">&times;</span>
+            </div>
+            <div class="modal-body compact-modal-body">
+                <p id="labelAbsenceRangeInfo" class="modal-info-text small-text"></p>
+
+                <div class="form-row-group">
+                    <div class="form-col">
+                        <label id="labelAbsenceStart" for="inputAbsenceStart">Von</label>
+                        <input type="date" id="inputAbsenceStart" class="form-date form-control-sm">
+                    </div>
+                    <div class="form-col">
+                        <label id="labelAbsenceEnd" for="inputAbsenceEnd">Bis</label>
+                        <input type="date" id="inputAbsenceEnd" class="form-date form-control-sm">
+                    </div>
+                </div>
+
+                <!-- Gleitzeit Checkbox (Visible only for Urlaub mode) -->
+                <div id="groupGleitzeit" class="form-row checkbox-row mt-2 hidden">
+                    <input type="checkbox" id="checkGleitzeit">
+                    <label id="labelCheckGleitzeit" for="checkGleitzeit">Als Gleitzeit buchen</label>
+                </div>
+
+                <!-- Krank Reason (Visible only for Krank mode) -->
+                <div id="groupKrankReason" class="form-row mt-2 hidden">
+                    <label id="labelReason" for="selectReason">Grund / Art</label>
+                    <select id="selectReason" class="form-select form-select-sm">
+                        <option value="krank" id="optKrank">Krankheit</option>
+                        <option value="kindkrank" id="optKindKrank">Kind krank</option>
+                        <option value="sonstiges" id="optOther">Sonstiges</option>
+                    </select>
+                    <p id="noteKrank" class="form-note small-text mt-1 text-danger"></p>
+                </div>
+
+                <div class="modal-actions compact-actions mt-3">
+                    <button id="btnSaveAbsence" class="btn btn-primary btn-sm">Bestätigen</button>
+                    <button id="btnCancelAbsence" class="btn btn-secondary btn-sm">Abbrechen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/holidays.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/logger.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/security.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/backup.js"></script>
+    <script src="js/search.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/version.js"></script>
+    <script src="js/report.js"></script>
+    <script src="js/calendar.js"></script>
+    <script src="js/timesheet.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/pdf.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+
+</html>
